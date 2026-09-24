@@ -21,5 +21,11 @@ pipeline {
                 sh 'python3 -m pytest -v'
             }
         }
+        stage('Code Quality') {
+            steps {
+                echo 'Running code quality analysis...'
+                sh 'python3 -m pylint app.py --fail-under=7.0'
+            }
+        }
     }
 }
