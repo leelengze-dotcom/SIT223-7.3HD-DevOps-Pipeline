@@ -27,5 +27,11 @@ pipeline {
                 sh 'python3 -m pylint app.py --fail-under=7.0'
             }
         }
+        stage('Security') {
+            steps {
+                echo 'Running security analysis...'
+                sh 'python3 -m bandit -r app.py'
+            }
+        }
     }
 }
