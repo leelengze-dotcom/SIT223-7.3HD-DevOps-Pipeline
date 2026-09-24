@@ -37,9 +37,9 @@ pipeline {
             steps {
                 echo 'Building and deploying Docker container...'
                 sh '''
-                    docker rm -f sit223-app || true
-                    docker build -t sit223-devops-app .
-                    docker run -d --name sit223-app -p 5000:5000 sit223-devops-app
+                    /usr/local/bin/docker rm -f sit223-app || true
+                    /usr/local/bin/docker build -t sit223-devops-app .
+                    /usr/local/bin/docker run -d --name sit223-app -p 5000:5000 sit223-devops-app
                 '''
             }
         }
