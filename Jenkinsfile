@@ -51,20 +51,29 @@ pipeline {
         stage('Release') {
             steps {
                 echo 'Promoting application to production...'
-                sh '''
-                    /usr/local/bin/docker rm -f sit223-production || true
         
-                    /usr/local/bin/docker tag \
-                        sit223-devops-app:latest \
-                        sit223-devops-app:release-${BUILD_NUMBER}
+                withCredentials([string(
+                    credentialsId: 'new-relic-license-key',
+                    variable: 'NEW_RELIC_LICENSE_KEY'
+                )]) {
+                    sh '''
+                        /usr/local/bin/docker rm -f sit223-production || true
         
-                    /usr/local/bin/docker run -d \
-                        --name sit223-production \
-                        -p 5002:5000 \
-                        sit223-devops-app:release-${BUILD_NUMBER}
+                        /usr/local/bin/docker tag \
+                            sit223-devops-app:latest \
+                            sit223-devops-app:release-${BUILD_NUMBER}
         
-                    echo "Released version: release-${BUILD_NUMBER}"
-                '''
+                        /usr/local/bin/docker run -d \
+                            --name sit223-production \
+                            -p 5002:5000 \
+                            -e NEW_RELIC_LICENSE_KEY="$NEW_RELIC_LICENSE_KEY" \
+                            -e NEW_RELIC_APP_NAME="SIT223-DevOps-Production" \
+                            sit223-devops-app:release-${BUILD_NUMBER} \
+                            newrelic-admin run-program python app.py
+        
+                        echo "Released version: release-${BUILD_NUMBER}"
+                    '''
+                }
             }
         }
     }
